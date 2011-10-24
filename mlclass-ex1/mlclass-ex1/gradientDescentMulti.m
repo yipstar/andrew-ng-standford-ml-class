@@ -14,24 +14,22 @@ for iter = 1:num_iters
     %               theta. 
     %
     % Hint: While debugging, it can be useful to print out the values
-    %       of the cost function (computeCostMulti) and gradient here.
+    %       of the cost function (computeCost) and gradient here.
     %
 
+  temp_theta = zeros(size(theta, 1), 1);
 
+  for i = 1:size(theta, 1)
 
+    predictions = X*theta;
+    errors = predictions - y;
 
+    temp_theta(i) = theta(i) - (alpha .* 1/m) .* sum(errors .* X(:,i));   
+  end
 
+  theta = temp_theta;
 
-
-
-
-
-
-    % ============================================================
-
-    % Save the cost J in every iteration    
-    J_history(iter) = computeCostMulti(X, y, theta);
-
-end
+  % Save the cost J in every iteration    
+  J_history(iter) = computeCost(X, y, theta);
 
 end
