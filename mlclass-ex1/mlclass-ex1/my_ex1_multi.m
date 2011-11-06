@@ -29,9 +29,15 @@ num_iters = 100;
 
 % Init Theta and Run Gradient Descent 
 theta = zeros(3, 1);
-[theta, J_history] = gradientDescentMulti(X, y, theta, alpha, num_iters);
+
+%computeCost(X, y, theta)
+
+predictions = X * theta
+
+
+%[theta, J_history] = gradientDescentMulti(X, y, theta, alpha, num_iters);
 
 % Display gradient descent's result
-fprintf('Theta computed from gradient descent: \n');
-fprintf(' %f \n', theta);
-fprintf('\n');
+%fprintf('Theta computed from gradient descent: \n');
+%fprintf(' %f \n', theta);
+%fprintf('\n');
