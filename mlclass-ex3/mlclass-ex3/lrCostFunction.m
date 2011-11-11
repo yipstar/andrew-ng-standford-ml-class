@@ -38,6 +38,7 @@ grad = zeros(size(theta));
 
 
 J = 1./m * ( -y' * log( sigmoid(X * theta) ) - ( 1 - y' ) * log ( 1 - sigmoid( X * theta)) );
+
 J = J +  lambda / 2. / m * ( theta' * theta - theta(1)^2 );
 
 mask = ones(size(theta));
