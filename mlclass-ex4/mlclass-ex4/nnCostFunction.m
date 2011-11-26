@@ -25,11 +25,6 @@ Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):en
 % Setup some useful variables
 m = size(X, 1);
 
-size(Theta1);
-size(Theta2);
-size(X);
-size(y);
-
 % You need to return the following variables correctly 
 J = 0;
 Theta1_grad = zeros(size(Theta1));
@@ -57,7 +52,6 @@ end
 size(yv);
 
 % feed forward
-p = zeros(size(X, 1), 1);
 h1 = sigmoid([ones(m, 1) X] * Theta1');
 h2 = sigmoid([ones(m, 1) h1] * Theta2');
 % TODO: could have used this as well?:
@@ -88,6 +82,45 @@ end
 
 J = 1/m .* J;
 
+% Theta1 - 25 x 401
+% Theta2 - 10 x 26 
+
+% 400
+input_layer_size;
+
+% 25
+hidden_layer_size;
+
+% regularize
+reg = 0;
+
+left = 0;
+for j=1:hidden_layer_size
+  for k=1:input_layer_size + 1
+    if k == 1
+      left = left;
+    else
+      left = left + Theta1(j,k)^2;
+    end
+  end
+end
+left = lambda/(2*m) * left;
+
+right = 0;
+for j=1:num_labels
+  for k=1:hidden_layer_size + 1
+    if k == 1
+      right = right;
+    else
+      right = right + Theta2(j,k)^2;
+    end
+  end
+end
+right = lambda/(2*m) * right;
+
+reg = left + right;
+J = J + reg;
+
 %
 % Part 2: Implement the backpropagation algorithm to compute the gradients
 %         Theta1_grad and Theta2_grad. You should return the partial derivatives of
@@ -104,6 +137,62 @@ J = 1/m .* J;
 %               over the training examples if you are implementing it for the 
 %               first time.
 %
+
+%labels = 1:num_labels;
+
+% y(k) - the great trick - we need to recode the labels as vectors containing only values 0 or 1 (page 5 of ex4.pdf)
+yk = zeros(num_labels, m); 
+for i=1:m,
+  yk(y(i),i)=1;
+end
+
+for t=1:m
+
+  %fprintf("i:%i", t);
+
+  % 401 x 1
+  a1 = [1; X(t, :)'];
+
+  % 25 x 401 * 401 x 1
+  z2 = Theta1 * a1;
+
+  % 25 x 1
+  a2 = sigmoid(z2);
+  
+  % add bias, 26 x 1
+  a2 = [1; a2];
+
+  % 10 x 26 *  26 x 1 = 10 x 1
+  z3 = Theta2 * a2;
+  
+  % 10 x 1
+  a3 = sigmoid(z3);
+
+  % now comes back prop...
+
+  % TODO: figure out what was wrong with this way of computing yk
+  % 10 x 1 
+  %yk = (labels == y(i))';
+
+  z2=[1; z2]; % bias
+
+  % 10 x 1
+  delta3 = a3 - yk(:, t);
+
+  % 26 x 10 * 10 x 1 = 26 x 1
+  delta2 = Theta2' * delta3 .* sigmoidGradient(z2);
+
+  % remove delta2_zero, makes 25 x 1;  
+  delta2 = delta2(2:end);
+
+  Theta2_grad = Theta2_grad + delta3 * a2';
+  Theta1_grad = Theta1_grad + delta2 * a1';
+end
+
+% obtain unregularized gradients
+Theta1_grad = 1/m .* Theta1_grad;
+Theta2_grad = 1/m .* Theta2_grad;
+
 % Part 3: Implement regularization with the cost function and gradients.
 %
 %         Hint: You can implement this around the code for
@@ -112,23 +201,14 @@ J = 1/m .* J;
 %               and Theta2_grad from Part 2.
 %
 
+% zero bias units.
+mask1 = ones(size(Theta1));
+mask1(:, 1) = 0;
+mask2 = ones(size(Theta2));
+mask2(:, 1) = 0;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Theta1_grad = Theta1_grad + (lambda/m) * (Theta1 .* mask1);
+Theta2_grad = Theta2_grad + (lambda/m) * (Theta2 .* mask2);
 
 % -------------------------------------------------------------
 
