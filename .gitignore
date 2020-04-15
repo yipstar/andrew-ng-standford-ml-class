@@ -1,3 +1,5 @@
 octave-core
 vendor
 .#*
+CREDS
+CREDS.bak
